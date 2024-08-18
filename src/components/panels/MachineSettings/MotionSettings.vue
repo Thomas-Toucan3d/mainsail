@@ -88,6 +88,24 @@
                             @submit="sendCmd" />
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col :class="{ 'col-12': el.is.small, 'col-6': el.is.medium }">
+                        <number-input
+                            :label="$t('Panels.MachineSettingsPanel.MotionSettings.Acceleration')"
+                            param="A_Axis_Velocity"
+                            :target="aAxisVelocity"
+                            :default-value="aAxisVelocity"
+                            :output-error-msg="true"
+                            :has-spinner="true"
+                            :spinner-factor="300"
+                            :step="1"
+                            :min="1"
+                            :max="null"
+                            :dec="0"
+                            unit="mm/s²"
+                            @submit="sendCmd" />
+                    </v-col>
+                    </v-row>
             </template>
         </responsive>
     </v-container>
@@ -131,6 +149,10 @@ export default class MotionSettings extends Mixins(BaseMixin) {
 
     get defaultVelocity(): number {
         return Math.trunc(this.$store.state.printer?.configfile?.settings?.printer?.max_velocity ?? 300)
+    }
+
+    get aAxisVelocity(): number {
+        return Math.trunc(this.$store.state.printer?.configfile?.settings?.printer?.max_a_velocity ?? 300)
     }
 
     get defaultAccel(): number {
