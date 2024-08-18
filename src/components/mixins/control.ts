@@ -20,6 +20,10 @@ export default class ControlMixin extends Vue {
         return this.$store.state.gui.control?.feedrateZ ?? 10
     }
 
+    get feedrateA() {
+        return this.$store.state.gui.control?.feedrateA ?? 10
+    }
+
     get existsQGL() {
         return this.$store.getters['printer/existsQGL']
     }
@@ -84,6 +88,10 @@ export default class ControlMixin extends Vue {
         return this.homedAxes.includes('z')
     }
 
+    get aAxisHomed(): boolean {
+        return this.homedAxes.includes('a')
+    }
+
     get macros() {
         return this.$store.getters['printer/getMacros']
     }
@@ -122,6 +130,11 @@ export default class ControlMixin extends Vue {
     doHomeZ() {
         this.$store.dispatch('server/addEvent', { message: 'G28 Z', type: 'command' })
         this.$socket.emit('printer.gcode.script', { script: 'G28 Z' }, { loading: 'homeZ' })
+    }
+
+    doHomeA() {
+        this.$store.dispatch('server/addEvent', { message: 'G28 A', type: 'command' })
+        this.$socket.emit('printer.gcode.script', { script: 'G28 A' }, { loading: 'homeZ' })
     }
 
     doQGL() {

@@ -70,6 +70,19 @@
                             @submit="sendCmd"></move-to-input>
                     </v-col>
                 </v-row>
+                <v-row v-if="showCoordinates" dense>
+                    <v-col :class="el.is.xsmall ? 'col-12' : 'col-4'">
+                        <move-to-input
+                            v-model="input.a.pos"
+                            :label="livePositions.a"
+                            :suffix="'A'"
+                            :step="0.1"
+                            :current-pos="gcodePositions.a"
+                            :readonly="['printing'].includes(printer_state)"
+                            :disabled="!aAxisHomed"
+                            @submit="sendCmd"></move-to-input>
+                    </v-col>
+                </v-row>
             </template>
         </responsive>
     </v-container>
@@ -94,6 +107,7 @@ export default class MoveToControl extends Mixins(BaseMixin, ControlMixin) {
         x: { pos: '', valid: true },
         y: { pos: '', valid: true },
         z: { pos: '', valid: true },
+        a: { pos: '', valid: true },
     }
 
     @Watch('gcodePositions.x', { immediate: true })
@@ -111,6 +125,11 @@ export default class MoveToControl extends Mixins(BaseMixin, ControlMixin) {
         this.input.z.pos = newVal
     }
 
+    @Watch('gcodePositions.a', { immediate: true })
+    updatePositionZ(newVal: string): void {
+        this.input.a.pos = newVal
+    }
+
     /**
      * Axes positions and positioning mode (G90 / G91)
      */
@@ -125,20 +144,23 @@ export default class MoveToControl extends Mixins(BaseMixin, ControlMixin) {
     }
 
     get livePositions() {
-        const pos = this.$store.state.printer.motion_report?.live_position ?? [0, 0, 0]
+        const pos = this.$store.state.printer.motion_report?.live_position ?? [0, 0, 0, 0]
         return {
             x: pos[0]?.toFixed(2) ?? '--',
             y: pos[1]?.toFixed(2) ?? '--',
             z: pos[2]?.toFixed(3) ?? '--',
+            a: pos[3]?.toFixed(1) ?? '--',
+            
         }
     }
 
     get gcodePositions() {
-        const pos = this.$store.state.printer.gcode_move?.gcode_position ?? [0, 0, 0]
+        const pos = this.$store.state.printer.gcode_move?.gcode_position ?? [0, 0, 0, 0]
         return {
             x: pos[0]?.toFixed(2) ?? '--',
             y: pos[1]?.toFixed(2) ?? '--',
             z: pos[2]?.toFixed(3) ?? '--',
+            a: pos[3]?.toFixed(1) ?? '--',
         }
     }
 
@@ -173,6 +195,7 @@ export default class MoveToControl extends Mixins(BaseMixin, ControlMixin) {
         const xPos = this.input.x.pos !== this.gcodePositions.x ? ` X${this.input.x.pos}` : ''
         const yPos = this.input.y.pos !== this.gcodePositions.y ? ` Y${this.input.y.pos}` : ''
         const zPos = this.input.z.pos !== this.gcodePositions.z ? ` Z${this.input.z.pos}` : ''
+        const aPos = this.input.a.pos !== this.gcodePositions.a ? ` Z${this.input.a.pos}` : ''
 
         let gcode = ''
         if (!this.positionAbsolute) {

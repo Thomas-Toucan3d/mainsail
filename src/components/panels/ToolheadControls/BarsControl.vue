@@ -7,7 +7,7 @@
                     small
                     :disabled="['printing'].includes(printer_state)"
                     :loading="loadings.includes('homeAll')"
-                    :color="homedAxes.includes('xyz') ? 'primary' : 'warning'"
+                    :color="homedAxes.includes('xyza') ? 'primary' : 'warning'"
                     @click="doHome">
                     <v-icon class="mr-1">{{ mdiHome }}</v-icon>
                     {{ $t('Panels.ToolheadControlPanel.ALL') }}
@@ -148,6 +148,39 @@
         </v-row>
     </div>
 </template>
+    <!-- A MOVEMENT BUTTONGROUPS -->
+        <v-row dense>
+            <v-col class="text-center">
+                <v-item-group class="_btn-group row no-gutters">
+                    <v-btn
+                        v-for="steps of stepsAsorted"
+                        :key="'a-' + steps"
+                        :disabled="['printing'].includes(printer_state)"
+                        class="btnMinWidthAuto col btnGroup"
+                        @click="doSendMove('A-' + steps, feedrateA)">
+                        <span class="body-2">–{{ steps }}</span>
+                    </v-btn>
+                    <v-btn
+                        :disabled="['printing'].includes(printer_state)"
+                        :color="homedAxes.includes('a') ? 'primary' : 'warning'"
+                        :loading="loadings.includes('homeA')"
+                        class="font-weight-bold btnHomeAxis btnGroup"
+                        @click="doHomeA">
+                        Z
+                    </v-btn>
+                    <v-btn
+                        v-for="steps of stepsAsortedReverse"
+                        :key="'a+' + steps"
+                        :disabled="['printing'].includes(printer_state)"
+                        class="btnMinWidthAuto col btnGroup"
+                        @click="doSendMove('A+' + steps, feedrateA)">
+                        <span class="body-2">+{{ steps }}</span>
+                    </v-btn>
+                </v-item-group>
+            </v-col>
+        </v-row>
+    </div>
+</template>
 
 <script lang="ts">
 import { Component, Mixins } from 'vue-property-decorator'
@@ -184,6 +217,19 @@ export default class BarsControl extends Mixins(BaseMixin, ControlMixin) {
 
     get stepsZsortedReverse() {
         return [...this.$store.state.gui.control.stepsZ].sort(function (a, b) {
+            return a - b
+        })
+    }
+}
+
+    get stepsAsorted() {
+        return [...this.$store.state.gui.control.stepsA].sort(function (a, b) {
+            return b - a
+        })
+    }
+
+    get stepsAsortedReverse() {
+        return [...this.$store.state.gui.control.stepsA].sort(function (a, b) {
             return a - b
         })
     }
